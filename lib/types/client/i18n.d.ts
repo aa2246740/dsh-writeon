@@ -56,6 +56,8 @@ export declare const dictionaries: {
         readonly sharePreview: "Share preview";
         readonly shareX: "Post to X";
         readonly shareXConfirm: "The text below will be sent to X in a new tab. Continue?";
+        readonly expandPrompt: "Selection crosses a variant — expand to enclose it?";
+        readonly expand: "Expand";
         readonly cancel: "Cancel";
         readonly copy: "Copy";
         readonly linkedin: "LinkedIn";
@@ -129,6 +131,8 @@ export declare const dictionaries: {
         readonly sharePreview: "分享预览";
         readonly shareX: "发到 X";
         readonly shareXConfirm: "以下文字将发往 X（新标签页）。确定继续？";
+        readonly expandPrompt: "选区跨过了已有候选——是否扩展选区将其包入？";
+        readonly expand: "扩展";
         readonly cancel: "取消";
         readonly copy: "复制";
         readonly linkedin: "LinkedIn";

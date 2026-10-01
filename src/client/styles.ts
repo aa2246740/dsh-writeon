@@ -121,6 +121,7 @@ export const css = `
 .wo-dialog-acts{display:flex;gap:8px;position:relative}
 .wo-notice{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:#10152B;
   border:1px solid #AA926C;color:#D3C6BA;padding:8px 16px;border-radius:8px;font-size:12px;z-index:1100}
+.wo-expandbar{display:flex;gap:8px;align-items:center}
 .wo-egg{transition:transform .18s ease}
 .wo-egg-boom{animation:woboom .45s ease forwards}
 @keyframes woboom{0%{transform:scale(1);opacity:1}60%{transform:scale(2.4);opacity:.6}100%{transform:scale(0);opacity:0}}

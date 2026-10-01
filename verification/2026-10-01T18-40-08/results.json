@@ -1,0 +1,381 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node@24/24.20.0/bin/node",
+      "/Users/devin/repos/dsh-writeon/node_modules/.bin/playwright",
+      "test",
+      "--grep",
+      "partial-cross|fix-punctuation|AI alternatives|doc lifecycle"
+    ],
+    "configFile": "/Users/devin/repos/dsh-writeon/playwright.config.ts",
+    "rootDir": "/Users/devin/repos/dsh-writeon/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/devin/repos/dsh-writeon/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/devin/repos/dsh-writeon/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/devin/repos/dsh-writeon/verification/2026-10-01T18-40-08/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "deterministic.spec.ts",
+      "file": "deterministic.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "doc lifecycle: new document, typing, stats, autosave",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3188,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T18:40:12.576Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5d36395c280cbb34e3b0-30840cc504abb4ab31d5",
+          "file": "deterministic.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "AI alternatives (test provider): 3 options, select switches text + a/an link",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2303,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T18:40:16.085Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5d36395c280cbb34e3b0-a1a939274fd06f71eaf7",
+          "file": "deterministic.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "partial-cross selection prompts expand-or-cancel",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 11953,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('wo-expandbar')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByTestId('wo-expandbar') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('wo-expandbar')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('wo-expandbar')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByTestId('wo-expandbar') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('wo-expandbar')\u001b[22m\n\n    at /Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts:115:50",
+                    "location": {
+                      "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                      "column": 50,
+                      "line": 115
+                    },
+                    "snippet": "  113 |   await page.getByTestId('wo-alt-word').click()\n  114 |   // spec: a partial crossing prompts expand-or-cancel — never silently expands\n> 115 |   await expect(page.getByTestId('wo-expandbar')).toBeVisible()\n      |                                                  ^\n  116 |   await shot(page, 'partial-cross-prompt')\n  117 |   // cancel path: no new group, prompt clears\n  118 |   await page.getByTestId('wo-expand-no').click()"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "column": 50,
+                        "line": 115
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByTestId('wo-expandbar')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByTestId('wo-expandbar') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('wo-expandbar')\u001b[22m\n\n\n  113 |   await page.getByTestId('wo-alt-word').click()\n  114 |   // spec: a partial crossing prompts expand-or-cancel — never silently expands\n> 115 |   await expect(page.getByTestId('wo-expandbar')).toBeVisible()\n      |                                                  ^\n  116 |   await shot(page, 'partial-cross-prompt')\n  117 |   // cancel path: no new group, prompt clears\n  118 |   await page.getByTestId('wo-expand-no').click()\n    at /Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts:115:50"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T18:40:18.393Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/devin/repos/dsh-writeon/test-results/deterministic-partial-cros-29196-on-prompts-expand-or-cancel/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/devin/repos/dsh-writeon/test-results/deterministic-partial-cros-29196-on-prompts-expand-or-cancel/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "column": 50,
+                    "line": 115
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5d36395c280cbb34e3b0-e5477bc827aaf9710afd",
+          "file": "deterministic.spec.ts",
+          "line": 105,
+          "column": 1
+        },
+        {
+          "title": "fix-punctuation: only goal that applies text changes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T18:40:30.372Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "5d36395c280cbb34e3b0-fbe9528b80f5f14cfb94",
+          "file": "deterministic.spec.ts",
+          "line": 182,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "real-model.spec.ts",
+      "file": "real-model.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "real model: AI alternatives returns model-written options",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/real-model.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4135,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-01T18:40:30.573Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/real-model.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b525594735b80a5ca7f8-982bb146af1057ca68ff",
+          "file": "real-model.spec.ts",
+          "line": 23,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-01T18:40:12.306Z",
+    "duration": 22484.859,
+    "expected": 3,
+    "skipped": 1,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

@@ -107,11 +107,25 @@ test('partial-cross selection prompts expand-or-cancel', async ({ page }) => {
   await newDoc(page, T1)
   await selectText(page, 'owl')
   await page.getByTestId('wo-alt-word').click()
-  // select across the group's right boundary: 'owl. The dog runs'
-  await selectText(page, 'owl')
-  await page.keyboard.press('End')
-  await shot(page, 'partial-cross')
-  vlog('partial-cross: manual-verify')
+  await expect(page.locator('.wo-group').first()).toBeVisible()
+  // a selection starting at the group's exact left edge fully contains it (legal
+  // nesting); a true partial cross starts INSIDE the group and ends outside
+  await selectText(page, 'wl. The dog')
+  await page.getByTestId('wo-alt-word').click()
+  // spec: a partial crossing prompts expand-or-cancel — never silently expands
+  await expect(page.getByTestId('wo-expandbar')).toBeVisible()
+  await shot(page, 'partial-cross-prompt')
+  // cancel path: no new group, prompt clears
+  await page.getByTestId('wo-expand-no').click()
+  await expect(page.getByTestId('wo-expandbar')).not.toBeVisible()
+  expect(await page.locator('.wo-group').count()).toBe(1)
+  // expand path: prompt → expands selection → group created
+  await selectText(page, 'wl. The dog')
+  await page.getByTestId('wo-alt-word').click()
+  await page.getByTestId('wo-expand-yes').click()
+  await expect(page.locator('.wo-group')).toHaveCount(2)
+  await shot(page, 'partial-cross-expanded')
+  vlog('partial-cross: prompt + cancel + expand PASS')
 })
 
 test('ghost: manual dim mark; revive restores opacity', async ({ page }) => {

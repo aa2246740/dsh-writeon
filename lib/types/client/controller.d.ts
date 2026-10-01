@@ -40,6 +40,9 @@ export interface UiState {
         text: string;
         stats: DocStats;
     };
+    pendingExpand?: {
+        scope: 'word' | 'sentence' | 'paragraph';
+    };
     error?: string;
     language: 'zh' | 'en';
 }
@@ -89,6 +92,9 @@ export declare class WriteOnController {
     exportDoc(): Promise<void>;
     importDoc(file: File): Promise<void>;
     createVariantCmd(scope: 'word' | 'sentence' | 'paragraph'): void;
+    /** Expand the selection to enclose the crossed variant groups and create it. */
+    confirmExpand(): void;
+    cancelExpand(): void;
     openAlternatives(): void;
     openOverflow(): void;
     openLab(): void;

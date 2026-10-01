@@ -160,7 +160,7 @@ function AlternativesPanel({ c, t }: { c: WriteOnController; t: T }) {
             ))}
             <div className="wo-group-acts">
               <button className="wo-btn wo-mini" data-testid={`wo-group-manual-${g.id}`} onClick={() => c.addManualOption(g.id)}>{t('manualAlternative')}</button>
-              <button className="wo-btn wo-mini" data-testid={`wo-group-ai-${g.id}`} onClick={() => void c.aiAlternatives(g.id)} disabled={ui.providerKind === 'none'}>{t('aiAlternatives')}</button>
+              <button className="wo-btn wo-mini" data-testid={`wo-group-ai-${g.id}`} onClick={() => void c.aiAlternatives(g.id)} disabled={ui.providerKind === 'none' || ui.aiBusy !== undefined}>{t('aiAlternatives')}</button>
             </div>
           </div>
         )
@@ -430,6 +430,13 @@ export function WriteOnPage(props: PageProps) {
         {ui.sidePanel === 'lab' && <LabPanel c={c} t={t} />}
       </div>
       {ui.notice !== undefined && <div className="wo-notice" data-testid="wo-notice">{ui.notice}</div>}
+      {ui.pendingExpand !== undefined && (
+        <div className="wo-notice wo-expandbar" data-testid="wo-expandbar">
+          <span>{t('expandPrompt')}</span>
+          <button className="wo-btn wo-mini" data-testid="wo-expand-yes" onClick={() => c.confirmExpand()}>{t('expand')}</button>
+          <button className="wo-btn wo-mini" data-testid="wo-expand-no" onClick={() => c.cancelExpand()}>{t('cancel')}</button>
+        </div>
+      )}
       <ShareOverlay c={c} t={t} />
       {ui.phase === 'welcome' && (
         <div className="wo-overlay" data-testid="wo-welcome" onClick={e => { if (e.target === e.currentTarget) return }}>

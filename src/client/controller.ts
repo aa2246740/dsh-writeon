@@ -43,6 +43,7 @@ export interface UiState {
   stats: DocStats
   confirmShare?: { kind: 'x'; text: string }
   sharePreview?: { text: string; stats: DocStats }
+  pendingExpand?: { scope: 'word' | 'sentence' | 'paragraph' }
   error?: string
   language: 'zh' | 'en'
 }
@@ -373,15 +374,26 @@ export class WriteOnController {
     }
     const r = cmd.createVariant(this.view.state, this.entities, scope)
     if (!r.ok && r.error === 'partial-cross') {
-      const { from, to } = cmd.expandVariantRange(this.view.state, this.entities)
-      this.onTransaction(this.view.state.tr.setSelection(TextSelection.create(this.view.state.doc, from, to)))
-      const r2 = cmd.createVariant(this.view.state, this.entities, scope)
-      if (r2.ok) { this.dispatch(r2, 'variant-create'); this.openAlternatives() }
+      this.set({ pendingExpand: { scope } })
       return
     }
     if (r.ok) { this.dispatch(r, 'variant-create'); this.openAlternatives() }
     else this.notice(r.error)
   }
+
+  /** Expand the selection to enclose the crossed variant groups and create it. */
+  confirmExpand(): void {
+    const p = this.ui.pendingExpand
+    if (p === undefined || this.view === null) return
+    this.set({ pendingExpand: undefined })
+    const { from, to } = cmd.expandVariantRange(this.view.state, this.entities)
+    this.onTransaction(this.view.state.tr.setSelection(TextSelection.create(this.view.state.doc, from, to)))
+    const r2 = cmd.createVariant(this.view.state, this.entities, p.scope)
+    if (r2.ok) { this.dispatch(r2, 'variant-create'); this.openAlternatives() }
+    else this.notice(r2.error)
+  }
+
+  cancelExpand(): void { this.set({ pendingExpand: undefined }) }
 
   openAlternatives(): void { this.set({ sidePanel: 'alternatives' }) }
   openOverflow(): void { this.set({ sidePanel: 'overflow' }) }
@@ -649,7 +661,7 @@ export class WriteOnController {
       this.rebuildDecorations()
       return
     }
-    const tr = this.view.state.tr.replaceWith(from, to, schema.text(p.after))
+    const tr = p.after === '' ? this.view.state.tr.delete(from, to) : this.view.state.tr.replaceWith(from, to, schema.text(p.after))
     this.onTransaction(tr)
     this.dispatch(cmd.setProposalStatus(this.view.state, this.entities, runId, proposalId, 'cut'), 'fix-accept')
   }

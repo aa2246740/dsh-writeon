@@ -67,7 +67,6 @@ export function wordRanges(text: string): Range[] {
         i += run[0].length
         continue
       }
-      if (!/^\s$/.test(ch)) out.push({ from: index + i, to: index + i + ch.length })
       i += ch.length
     }
   }

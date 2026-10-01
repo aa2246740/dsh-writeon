@@ -40,6 +40,10 @@ describe('segment', () => {
     expect(countWords('hello world')).toBe(2)
     expect(countWords('三个字')).toBe(3)
   })
+  it('countWords does not count punctuation as words', () => {
+    expect(countWords('A cat sits on an owl. The dog runs fast.')).toBe(10)
+    expect(countWords('hello, world!')).toBe(2)
+  })
 })
 
 describe('articleFor (a/an)', () => {
