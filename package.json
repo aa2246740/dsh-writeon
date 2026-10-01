@@ -1,0 +1,83 @@
+{
+  "name": "dsh-writeon",
+  "version": "0.1.0",
+  "description": "Write On — a dedicated writing workspace for DeepSeek Harness with inline alternatives, Ghost, Overflow, Lab, and trim review.",
+  "type": "module",
+  "license": "MIT",
+  "main": "lib/dsh-writeon.js",
+  "types": "lib/types/dsh-writeon.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/dsh-writeon.d.ts",
+      "default": "./lib/dsh-writeon.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsdown",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "verify:e2e": "node scripts/run-host.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh-api-session-controller": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-host-webserver": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-locale": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-store": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-layout": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-sidebar": ">=0.2.0-rc.1 <0.2.1",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.2.0-rc.1 <0.2.1",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.4",
+    "@deepseek-ai/dsh-api-session-controller": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-locale": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-store": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.0",
+    "@types/react": "~18.3.1",
+    "@types/react-dom": "~18.3.1",
+    "lightningcss": "^1.33.0",
+    "prosemirror-commands": "^1.7.2",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-model": "^1.25.4",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-transform": "^1.12.2",
+    "prosemirror-view": "^1.42.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsdown": "^0.22.2",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.8"
+  },
+  "dependencies": {}
+}

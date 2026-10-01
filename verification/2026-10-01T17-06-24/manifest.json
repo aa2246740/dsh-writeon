@@ -1,0 +1,8 @@
+{
+  "runId": "2026-10-01T17-06-24",
+  "startedAt": "2026-10-01T17-06-24",
+  "host": "dsh web @deepseek-ai/dsh@0.2.0-rc.2",
+  "plugin": "dsh-writeon (link install)",
+  "provider": "zai-coding-cn/glm-5.3-flash (ZHIPU_API_KEY) + writeon-test deterministic",
+  "exitCode": 0
+}

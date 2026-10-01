@@ -1,0 +1,5 @@
+id: dsh-writeon
+entry: src/dsh-writeon.ts
+marker: '[my-plugins/dsh-writeon] loaded'
+kind: client
+profile: web
