@@ -1,5 +1,7 @@
 import type { WriteOnController } from './controller.js';
-type T = (key: keyof typeof import('./i18n.js').dictionaries.en) => string;
+import { dictionaries } from './i18n.js';
+type I18nKey = keyof typeof dictionaries.en;
+type T = (key: I18nKey) => string;
 interface PageProps {
     controller: WriteOnController;
     t: T;

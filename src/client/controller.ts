@@ -18,6 +18,7 @@ import { anchorPos, flatten, fragmentJSON, ghostRanges, groupRange } from '../ed
 import * as cmd from '../editor/commands.js'
 import { HttpProvider, TestProvider, type AiProvider } from './ai-provider.js'
 import { Presence, deleteProject, kvGet, kvSet, listProjects, loadProject, saveProject } from './storage.js'
+import { dictionaries } from './i18n.js'
 
 export interface ModelChoice { provider: string; model: string; label: string }
 
@@ -77,8 +78,25 @@ export class WriteOnController {
       sidePanel: 'none', models: [], providerKind: 'none', readOnly: false,
       conflictTab: false, hidden: false,
       stats: { words: 0, chars: 0, minutes: 0, paragraphs: 0, sentences: 0 },
-      language: (navigator.language ?? 'en').startsWith('zh') ? 'zh' : 'en',
+      language: WriteOnController.loadLanguage(),
     }
+  }
+
+  private static loadLanguage(): 'zh' | 'en' {
+    try {
+      const saved = localStorage.getItem('wo-lang')
+      if (saved === 'zh' || saved === 'en') return saved
+    } catch { /* ignore */ }
+    return (navigator.language ?? 'en').startsWith('zh') ? 'zh' : 'en'
+  }
+
+  setLanguage(lang: 'zh' | 'en'): void {
+    try { localStorage.setItem('wo-lang', lang) } catch { /* ignore */ }
+    this.set({ language: lang })
+  }
+
+  private tr(key: keyof typeof dictionaries.en): string {
+    return dictionaries[this.ui.language][key] ?? dictionaries.en[key] ?? String(key)
   }
 
   // ---- React bridge -------------------------------------------------------
@@ -163,7 +181,7 @@ export class WriteOnController {
     }
     if (stale.length > 0 && this.ui.activeRunId !== undefined && stale.some(r => r.id === this.ui.activeRunId)) {
       this.set({ activeRunId: undefined, walkIndex: undefined })
-      this.notice(this.ui.language === 'zh' ? '预览已失效（文档有改动）' : 'Preview invalidated by edits')
+      this.notice(this.tr('previewStale'))
     }
   }
 
@@ -176,7 +194,7 @@ export class WriteOnController {
 
   dispatch(cmdResult: cmd.CmdResult, undoTag?: string): boolean {
     if (this.view === null || !cmdResult.ok) {
-      if (!cmdResult.ok && cmdResult.error === 'partial-cross') this.notice(this.ui.language === 'zh' ? '选择只部分覆盖了候选——已自动扩展' : 'Selection crossed a variant — expanded')
+      if (!cmdResult.ok && cmdResult.error === 'partial-cross') this.notice(this.tr('expandedAuto'))
       return false
     }
     if (undoTag !== undefined) cmdResult.tr.setMeta('writeon:undoTag', undoTag)
@@ -250,9 +268,9 @@ export class WriteOnController {
   }
 
   private deriveTitle(): string {
-    if (this.view === null) return 'Untitled'
+    if (this.view === null) return ''
     const first = flatten(this.view.state.doc).map(l => l.text.trim()).find(t => t !== '')
-    return (first ?? 'Untitled').slice(0, 60)
+    return (first ?? '').slice(0, 60)
   }
 
   private scheduleSave(): void {
@@ -272,7 +290,7 @@ export class WriteOnController {
       void kvSet('lastOpenId', file.id)
     } catch {
       this.set({ saved: 'error' })
-      this.notice(this.ui.language === 'zh' ? '保存失败' : 'Save failed')
+      this.notice(this.tr('saveFailed'))
     }
   }
 
@@ -290,7 +308,7 @@ export class WriteOnController {
 
   async openDoc(id: string): Promise<void> {
     const file = await loadProject(id)
-    if (file === undefined) { this.notice('not found'); return }
+    if (file === undefined) { this.notice(this.tr('docNotFound')); return }
     if (file.schemaVersion !== SCHEMA_VERSION) {
       const r = deserializeProject(serializeProject(file), id)
       if ('error' in r) { this.set({ phase: 'error', error: r.error.detail }); return }
@@ -345,7 +363,7 @@ export class WriteOnController {
     const text = await file.text()
     const r = deserializeProject(text, newId('doc'))
     if ('error' in r) {
-      this.notice(this.ui.language === 'zh' ? `导入失败：${r.error.detail}` : `Import failed: ${r.error.detail}`)
+      this.notice(`${this.tr('importFailed')}: ${r.error.detail}`)
       return
     }
     await this.saveNow()
@@ -372,14 +390,14 @@ export class WriteOnController {
         this.onTransaction(tr)
       }
     }
-    if (this.view.state.selection.empty) { this.notice('select a range first'); return }
+    if (this.view.state.selection.empty) { this.notice(this.tr('selectRange')); return }
     const r = cmd.createVariant(this.view.state, this.entities, scope)
     if (!r.ok && r.error === 'partial-cross') {
       this.set({ pendingExpand: { scope } })
       return
     }
     if (r.ok) { this.dispatch(r, 'variant-create'); this.openAlternatives() }
-    else this.notice(r.error)
+    else this.notice(`${this.tr('opFailed')}: ${r.error}`)
   }
 
   /** Expand the selection to enclose the crossed variant groups and create it. */
@@ -391,7 +409,7 @@ export class WriteOnController {
     this.onTransaction(this.view.state.tr.setSelection(TextSelection.create(this.view.state.doc, from, to)))
     const r2 = cmd.createVariant(this.view.state, this.entities, p.scope)
     if (r2.ok) { this.dispatch(r2, 'variant-create'); this.openAlternatives() }
-    else this.notice(r2.error)
+    else this.notice(`${this.tr('opFailed')}: ${r2.error}`)
   }
 
   cancelExpand(): void { this.set({ pendingExpand: undefined }) }
@@ -420,7 +438,7 @@ export class WriteOnController {
     if (this.view === null) return
     const r = cmd.deleteOption(this.view.state, this.entities, gid, oid)
     if (r.ok) this.dispatch(r, 'variant-delete')
-    else this.notice(this.ui.language === 'zh' ? '原文不可删除' : 'The original cannot be deleted')
+    else this.notice(this.tr('originalLocked'))
   }
 
   addManualOption(gid: string): void {
@@ -439,7 +457,7 @@ export class WriteOnController {
     if (sel.empty) {
       const r = cmd.reviveGhost(this.view.state, { pos: sel.from })
       if (r.ok) { this.dispatch(r, 'ghost-revive'); return }
-      this.notice(this.ui.language === 'zh' ? '光标不在 Ghost 中' : 'Caret is not inside a ghost')
+      this.notice(this.tr('notInGhost'))
       return
     }
     const r = cmd.ghostSelection(this.view.state)
@@ -447,7 +465,7 @@ export class WriteOnController {
     else if (r.error === 'already-ghost') {
       const rv = cmd.reviveGhost(this.view.state, { pos: sel.from })
       if (rv.ok) this.dispatch(rv, 'ghost-revive')
-    } else this.notice(r.error)
+    } else this.notice(`${this.tr('opFailed')}: ${r.error}`)
   }
 
   reviveGhostAt(pos: number): void {
@@ -460,7 +478,7 @@ export class WriteOnController {
     if (this.view === null) return
     const r = cmd.stashSelection(this.view.state, this.entities)
     if (r.ok) { this.dispatch(r, 'stash'); this.openOverflow() }
-    else this.notice(r.error)
+    else this.notice(`${this.tr('opFailed')}: ${r.error}`)
   }
 
   insertOverflow(itemId: string, at?: number): void {
@@ -547,9 +565,9 @@ export class WriteOnController {
     const runId = newRunId()
     const prompt = alternativesPrompt({ requestId, baseRevision: base.baseRevision, baseHash: base.baseHash, scope: group.scope, target, context, count, language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: 'alternatives', runId })
-    if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
+    if (!ok || text === undefined) { this.notice(this.tr('modelFailed')); return }
     const valid = validateAlternatives(extractJson(text), base)
-    if (!valid.ok) { this.notice(`AI response rejected: ${valid.reason}`); return }
+    if (!valid.ok) { this.notice(`${this.tr('aiRejected')}: ${valid.reason}`); return }
     this.dispatch(cmd.addOptions(this.view.state, this.entities, gid, valid.response.items.map(i => i.text), 'ai', group.scope), 'variant-ai')
     this.openAlternatives()
   }
@@ -565,7 +583,7 @@ export class WriteOnController {
     const requestId = newRequestId()
     const prompt = labPrompt({ requestId, baseRevision, baseHash, goal, fix, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: fix ? 'fix' : 'diagnose', runId })
-    if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
+    if (!ok || text === undefined) { this.notice(this.tr('modelFailed')); return }
     const valid = validateDiagnose(extractJson(text), { requestId, baseRevision, baseHash }, leaves, fix ? 'fix' : 'diagnose')
     if (!valid.ok) {
       this.rejectRun({ id: runId, mode: fix ? 'lab-fix' : 'lab-mark', goal, baseRevision, baseHash, createdAt: Date.now() }, valid.reason)
@@ -584,14 +602,14 @@ export class WriteOnController {
     this.dispatch(cmd.putRun(this.view.state, run))
     this.set({ activeRunId: runId })
     this.rebuildDecorations()
-    if (run.proposals.length === 0) this.notice(this.ui.language === 'zh' ? '没有建议' : 'No suggestions')
+    if (run.proposals.length === 0) this.notice(this.tr('noSuggestions'))
   }
 
   /** Persist a rejected AI response as a visible run row so the call leaves a durable record. */
   private rejectRun(run: Omit<LabRun, 'proposals' | 'status'>, reason: string): void {
     if (this.view === null) return
     this.dispatch(cmd.putRun(this.view.state, { ...run, proposals: [], status: 'rejected' }))
-    this.notice(`AI response rejected: ${reason}`)
+    this.notice(`${this.tr('aiRejected')}: ${reason}`)
   }
 
   /** Trim at a level; Original=restore baseline handled separately. */
@@ -607,7 +625,7 @@ export class WriteOnController {
     const prompt = trimPrompt({ requestId, baseRevision, baseHash, level, targetWords, currentWords, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const baselineDoc = this.view.state.doc.toJSON()
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: 'trim', runId })
-    if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
+    if (!ok || text === undefined) { this.notice(this.tr('modelFailed')); return }
     const valid = validateTrim(extractJson(text), { requestId, baseRevision, baseHash, level }, leaves)
     if (!valid.ok) {
       this.rejectRun({ id: runId, mode: 'trim', level, baseRevision, baseHash, baselineDoc, baselineStats: { words: currentWords }, createdAt: Date.now() }, valid.reason)
@@ -653,11 +671,11 @@ export class WriteOnController {
     if (run === undefined || p === undefined || p.after === undefined) return
     const leaves = flatten(this.view.state.doc)
     const leaf = leaves.find(l => l.leafId === p.anchor.leafId)
-    if (leaf === undefined) { this.notice('stale anchor'); return }
+    if (leaf === undefined) { this.notice(this.tr('staleAnchor')); return }
     const from = anchorPos(leaf, p.anchor.from)
     const to = anchorPos(leaf, p.anchor.to)
     if (this.view.state.doc.textBetween(from, to, '\0', '\0') !== p.anchor.quote) {
-      this.notice(this.ui.language === 'zh' ? '建议已过期（原文已变）' : 'Proposal is stale (text changed)')
+      this.notice(this.tr('propStale'))
       this.dispatch(cmd.setProposalStatus(this.view.state, this.entities, runId, proposalId, 'conflict'))
       this.rebuildDecorations()
       return
@@ -675,10 +693,10 @@ export class WriteOnController {
     if (r.ok) {
       this.dispatch(r, 'trim-apply')
       this.rebuildDecorations()
-      this.notice(this.ui.language === 'zh' ? '已裁剪（Ctrl+Z 撤销全部）' : 'Cuts applied (Ctrl+Z undoes all)')
+      this.notice(this.tr('cutsApplied'))
     } else {
       this.dispatch(cmd.updateRun(this.view.state, this.entities, runId, run => ({ ...run, status: 'conflict' })))
-      this.notice(this.ui.language === 'zh' ? '裁剪冲突：文本已变化' : 'Cut conflict: text changed')
+      this.notice(this.tr('cutConflict'))
       this.rebuildDecorations()
     }
   }

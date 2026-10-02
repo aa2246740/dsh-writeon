@@ -57,7 +57,7 @@ export async function listProjects(): Promise<ProjectSummary[]> {
   return all
     .map(p => ({
       id: p.id,
-      title: (p.meta.title || 'Untitled') as string,
+      title: (p.meta.title || '') as string,
       updatedAt: p.meta.updatedAt,
       words: 0,
     }))

@@ -146,7 +146,8 @@ export async function selectText(page: Page, text: string, occurrence = 0) {
  */
 export async function saved(page: Page) {
   await page.waitForTimeout(1200)
-  await expect(page.getByTestId('wo-savestate')).toHaveText(/Saved|saved/)
+  // The badge text is localized — accept either dictionary's "saved" label.
+  await expect(page.getByTestId('wo-savestate')).toHaveText(/Saved|saved|已保存/)
 }
 
 /** First alternatives group testid → group id. */

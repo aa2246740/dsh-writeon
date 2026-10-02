@@ -63,6 +63,9 @@ export declare class WriteOnController {
     constructor(host: {
         selectPanel(id: string | null): void;
     });
+    private static loadLanguage;
+    setLanguage(lang: 'zh' | 'en'): void;
+    private tr;
     subscribe: (l: Listener) => (() => void);
     getSnapshot: () => UiState;
     private set;

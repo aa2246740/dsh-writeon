@@ -3,8 +3,10 @@ import type { WriteOnController, UiState } from './controller.js'
 import { groupRange } from '../editor/model.js'
 import { groupAt, selectGroupRange } from '../editor/commands.js'
 import type { LabGoal } from '../domain/prompts.js'
+import { dictionaries } from './i18n.js'
 
-type T = (key: keyof typeof import('./i18n.js').dictionaries.en) => string
+type I18nKey = keyof typeof dictionaries.en
+type T = (key: I18nKey) => string
 
 interface PageProps {
   controller: WriteOnController
@@ -98,6 +100,7 @@ function Toolbar({ c, t, selectPanel }: { c: WriteOnController; t: T; selectPane
       <button className="wo-btn wo-small" data-testid="wo-panel-lab" onClick={() => c.openLab()}>{t('lab')}</button>
       <button className="wo-btn wo-small" data-testid="wo-share" onClick={() => c.sharePreview()} title="Ctrl+Shift+P">{t('share')}</button>
       <span className="wo-flex" />
+      <button className="wo-btn wo-small" data-testid="wo-lang" onClick={() => c.setLanguage(ui.language === 'zh' ? 'en' : 'zh')} title="中/EN">{t('langSwitch')}</button>
       <button className="wo-btn wo-small" data-testid="wo-hide" onClick={() => c.toggleHidden()} title="Alt+Shift+Z">{t('hideControls')}</button>
       <button className="wo-btn wo-small" data-testid="wo-save" onClick={() => void c.saveNow()} title="Ctrl+S">{t('save')}</button>
     </div>
@@ -149,7 +152,7 @@ function AlternativesPanel({ c, t }: { c: WriteOnController; t: T }) {
               const r = cmd_select(view, c, g.id)
               void r
             }}>
-              <span className="wo-group-scope">{g.scope}</span>
+              <span className="wo-group-scope">{t(SCOPE_KEY[g.scope])}</span>
               <button className="wo-btn wo-mini" data-testid={`wo-group-prev-${g.id}`} onClick={e => { e.stopPropagation(); c.cycleOption(g.id, -1) }}>↑</button>
               <button className="wo-btn wo-mini" data-testid={`wo-group-next-${g.id}`} onClick={e => { e.stopPropagation(); c.cycleOption(g.id, 1) }}>↓</button>
             </div>
@@ -210,6 +213,17 @@ function OverflowPanel({ c, t }: { c: WriteOnController; t: T }) {
   )
 }
 
+const SCOPE_KEY = { word: 'scopeWord', sentence: 'scopeSentence', paragraph: 'scopeParagraph' } as const
+
+const RUN_MODE_KEY: Record<string, I18nKey> = {
+  'lab-mark': 'runLabMark', 'lab-fix': 'runLabFix', trim: 'runTrim',
+}
+
+const RUN_STATUS_KEY: Record<string, I18nKey> = {
+  pending: 'statusPending', applied: 'statusApplied', conflict: 'statusConflict',
+  stale: 'statusStale', cancelled: 'statusCancelled', done: 'statusDone', rejected: 'statusRejected',
+}
+
 const LAB_GOALS: { key: LabGoal; labelKey: keyof typeof import('./i18n.js').dictionaries.en }[] = [
   { key: 'fix-punctuation', labelKey: 'fixPunctuation' },
   { key: 'weakest-sentences', labelKey: 'weakestSentences' },
@@ -241,7 +255,7 @@ function LabPanel({ c, t }: { c: WriteOnController; t: T }) {
       </div>
       {runs.filter(r => r.status !== 'done' && r.status !== 'applied').map(run => (
         <div key={run.id} className={`wo-run wo-run-${run.status}`} data-testid={`wo-run-${run.id}`}>
-          <div className="wo-run-head">{run.mode}{run.goal !== undefined ? ` · ${run.goal}` : ''}{run.level !== undefined ? ` · ${run.level}%` : ''} · {run.status}</div>
+          <div className="wo-run-head">{t(RUN_MODE_KEY[run.mode] ?? 'runLabMark')}{run.goal !== undefined ? ` · ${t(goalLabelKey(run.goal))}` : ''}{run.level !== undefined ? ` · ${run.level}%` : ''} · {t(RUN_STATUS_KEY[run.status] ?? 'statusPending')}</div>
           {run.proposals.map(p => (
             <div key={p.id} className={`wo-prop wo-prop-${p.status}`} data-testid={`wo-prop-${p.id}`}
               onClick={() => c.walkTo(run.id, run.proposals.indexOf(p))}>
@@ -348,9 +362,11 @@ function ShareOverlay({ c, t }: { c: WriteOnController; t: T }) {
 
 /** The workspace root: toolbar + doc list + editor canvas + side panel. */
 export function WriteOnPage(props: PageProps) {
-  const { controller: c, t, selectPanel } = props
+  const { controller: c, selectPanel } = props
   const mountRef = useRef<HTMLDivElement>(null)
   const ui = useUi(c)
+  // UI language follows the plugin's own switch (persisted), not the host locale.
+  const t: T = k => dictionaries[ui.language][k] ?? dictionaries.en[k]
 
   useEffect(() => {
     const el = mountRef.current
@@ -456,3 +472,8 @@ export function WriteOnPage(props: PageProps) {
 function groupAtSelection(view: NonNullable<WriteOnController['editorView']>, c: WriteOnController) {
   return groupAt(view.state.doc, c.entities, view.state.selection.from)
 }
+
+function goalLabelKey(goal: string): I18nKey {
+  return LAB_GOALS.find(g => g.key === goal)?.labelKey ?? 'hedgesFiller'
+}
+
