@@ -20,7 +20,6 @@ export interface UiState {
     savedAt?: number;
     sidePanel: 'none' | 'alternatives' | 'overflow' | 'lab';
     focusGroupId?: string;
-    hoverGid?: string;
     activeRunId?: string;
     walkIndex?: number;
     models: ModelChoice[];
@@ -60,6 +59,7 @@ export declare class WriteOnController {
     private project;
     private disposeFns;
     private destroyed;
+    private lastDecoSpecs;
     constructor(host: {
         selectPanel(id: string | null): void;
     });

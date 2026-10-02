@@ -29,7 +29,6 @@ export interface UiState {
   savedAt?: number
   sidePanel: 'none' | 'alternatives' | 'overflow' | 'lab'
   focusGroupId?: string
-  hoverGid?: string
   activeRunId?: string
   walkIndex?: number
   models: ModelChoice[]
@@ -50,6 +49,12 @@ export interface UiState {
 
 type Listener = () => void
 
+const decoSpecsEqual = (a: DecoSpec[], b: DecoSpec[]): boolean =>
+  a.length === b.length && a.every((s, i) => {
+    const o = b[i]
+    return o !== undefined && s.kind === o.kind && s.from === o.from && s.to === o.to && s.cls === o.cls
+  })
+
 const AUTOSAVE_MS = 600
 
 export class WriteOnController {
@@ -64,6 +69,7 @@ export class WriteOnController {
   private project: ProjectFile | null = null
   private disposeFns: (() => void)[] = []
   private destroyed = false
+  private lastDecoSpecs: DecoSpec[] = []
 
   constructor(private host: { selectPanel(id: string | null): void }) {
     this.ui = {
@@ -131,14 +137,6 @@ export class WriteOnController {
     this.view = new EditorView(el, {
       state,
       dispatchTransaction: tr => this.onTransaction(tr),
-      handleDOMEvents: {
-        mousemove: (view, ev) => {
-          const pos = view.posAtCoords({ left: ev.clientX, top: ev.clientY })
-          const gid = pos === null ? undefined : cmd.groupAt(view.state.doc, this.entities, pos.pos)?.id
-          if (gid !== this.ui.hoverGid) { this.set({ hoverGid: gid }); this.rebuildDecorations() }
-          return false
-        },
-      },
       editable: () => !this.ui.readOnly,
     })
     this.disposeFns.push(() => { this.view?.destroy(); this.view = null })
@@ -222,6 +220,8 @@ export class WriteOnController {
         if (r.to < doc.content.size) specs.push({ kind: 'focusdim', from: r.to, to: doc.content.size })
       }
     }
+    if (decoSpecsEqual(specs, this.lastDecoSpecs)) return
+    this.lastDecoSpecs = specs
     this.view.updateState(this.view.state.apply(setDecorations(this.view.state, specs)))
   }
 
@@ -372,6 +372,7 @@ export class WriteOnController {
         this.onTransaction(tr)
       }
     }
+    if (this.view.state.selection.empty) { this.notice('select a range first'); return }
     const r = cmd.createVariant(this.view.state, this.entities, scope)
     if (!r.ok && r.error === 'partial-cross') {
       this.set({ pendingExpand: { scope } })

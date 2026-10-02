@@ -12,6 +12,7 @@ link-installed, real page — no mocked DOM):
 | `verification/2026-10-01T17-06-24` | `zai-coding-cn/glm-5.3-flash` (real GLM, `ZHIPU_API_KEY`) | 4/4 PASS, exit 0 |
 | `verification/2026-10-01T17-40-42` | both suites in one host run | 23/23 PASS, exit 0 |
 | `verification/2026-10-01T18-43-55` | both suites after adversarial-review fixes (acceptFix empty-after delete, partial-cross expand prompt, AI-busy gating, word-count punctuation) | 23/23 PASS, exit 0 |
+| `verification/2026-10-02T01-29-52` | both suites after flicker fixes (decoration-rebuild dedup, dead hoverGid mousemove removed) | 23/23 PASS, exit 0 |
 
 Unit: 67 vitest cases (`npm test`). Status legend: **PASS** verified in a real
 host run · **UNIT** covered by unit tests only · **PARTIAL** covered but a named
