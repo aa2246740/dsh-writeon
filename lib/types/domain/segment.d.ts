@@ -18,6 +18,14 @@ export interface Range {
  * not split unspaced CJK into useful units) and pure-whitespace dropped.
  */
 export declare function wordRanges(text: string): Range[];
+/**
+ * Word units for caret-snapping and variants: ICU dictionary words, so a CJK
+ * run stays whole ("写作" is one unit) instead of the per-character ranges
+ * `wordRanges` emits for word-count purposes.
+ */
+export declare function wordUnitRanges(text: string): Range[];
+/** Dominant writing language of the text: 'zh' when CJK chars outnumber latin. */
+export declare function detectDocLanguage(text: string): 'zh' | 'en';
 /** Sentence ranges of `text`, keeping offsets; pure-whitespace gaps dropped. */
 export declare function sentenceRanges(text: string): Range[];
 /**

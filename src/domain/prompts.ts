@@ -22,11 +22,13 @@ export function alternativesPrompt(args: {
   target: string
   context: string
   count: number
+  language: string
 }): string {
   const scopeLabel = args.scope === 'word' ? 'word or short phrase' : args.scope
   return `${CONTRACT_NOTE}
 
 Task: propose ${args.count} alternative phrasings for the TARGET ${scopeLabel} below. Keep the author's meaning and register; similar length is fine but a tighter option is welcome. Do not number or annotate the options inside "text"; put any brief note in "reason". The alternatives must differ from each other and from the target.
+Language of the text: ${args.language}. Write alternatives in the same language as TARGET.
 
 TARGET:
 ${args.target}

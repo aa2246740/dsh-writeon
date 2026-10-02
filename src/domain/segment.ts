@@ -73,6 +73,29 @@ export function wordRanges(text: string): Range[] {
   return out
 }
 
+/**
+ * Word units for caret-snapping and variants: ICU dictionary words, so a CJK
+ * run stays whole ("写作" is one unit) instead of the per-character ranges
+ * `wordRanges` emits for word-count purposes.
+ */
+export function wordUnitRanges(text: string): Range[] {
+  const out: Range[] = []
+  for (const seg of wordSegmenter.segment(text)) {
+    if (seg.isWordLike === true) out.push({ from: seg.index, to: seg.index + seg.segment.length })
+  }
+  return out
+}
+
+/** Dominant writing language of the text: 'zh' when CJK chars outnumber latin. */
+export function detectDocLanguage(text: string): 'zh' | 'en' {
+  let cjk = 0, latin = 0
+  for (const ch of text) {
+    if (/^[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]$/.test(ch)) cjk += 1
+    else if (/^[a-zA-Z]$/.test(ch)) latin += 1
+  }
+  return cjk > latin ? 'zh' : 'en'
+}
+
 /** Sentence ranges of `text`, keeping offsets; pure-whitespace gaps dropped. */
 export function sentenceRanges(text: string): Range[] {
   const out: Range[] = []

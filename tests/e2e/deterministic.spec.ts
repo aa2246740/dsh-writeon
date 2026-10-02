@@ -317,6 +317,37 @@ test('shortcuts scoped to writing focus: Alt+Enter variant, Ctrl+/ ghost', async
   vlog('shortcuts: PASS')
 })
 
+test('chinese: typing, stats, word/sentence variants, ghost, persistence', async ({ page }) => {
+  await openWriteOn(page, { provider: 'test' })
+  const ZH = '今天下雨了。我明天去公园！'
+  await newDoc(page, ZH)
+  // stats: 11 CJK chars counted as 字 (punctuation excluded); 2 sentences
+  await expect(page.getByTestId('wo-stats')).toContainText('11')
+  // word variant on a 2-char CJK word
+  await selectText(page, '公园')
+  await page.getByTestId('wo-alt-word').click()
+  await expect(page.locator('.wo-group').first()).toBeVisible()
+  await expect(page.locator('.wo-group').first()).toContainText('公园')
+  // sentence variant ending in 。 / ！
+  await selectText(page, '今天下雨了。')
+  await page.getByTestId('wo-alt-sentence').click()
+  await expect(page.locator('.wo-group')).toHaveCount(2)
+  await shot(page, 'zh-variants')
+  // ghost on the second sentence
+  await selectText(page, '我明天去公园！')
+  await page.getByTestId('wo-ghost').click()
+  await shot(page, 'zh-ghost')
+  // autosave + reload persistence (IndexedDB round-trip on CJK text)
+  await saved(page)
+  await page.reload()
+  await openWriteOn(page, { provider: 'test' })
+  await expect(page.locator('.wo-editor .ProseMirror')).toContainText('今天下雨了')
+  await page.getByTestId('wo-panel-alt').click()
+  await expect(page.locator('.wo-group')).toHaveCount(2)
+  await shot(page, 'zh-reload')
+  vlog('chinese journey: PASS')
+})
+
 test('multi-window: second page in same context opens same doc without corruption', async ({ page, context }) => {
   await openWriteOn(page, { provider: 'test' })
   await newDoc(page, 'Multi window text.')

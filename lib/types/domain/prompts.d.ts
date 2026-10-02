@@ -14,6 +14,7 @@ export declare function alternativesPrompt(args: {
     target: string;
     context: string;
     count: number;
+    language: string;
 }): string;
 export type LabGoal = 'fix-punctuation' | 'weakest-sentences' | 'long-sentences' | 'convoluted-sentences' | 'tone-misfit' | 'hedges-filler';
 export declare function labPrompt(args: {

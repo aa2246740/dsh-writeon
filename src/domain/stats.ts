@@ -1,4 +1,4 @@
-import { countWords, graphemeLength } from './segment.js'
+import { graphemeLength, wordRanges } from './segment.js'
 
 /** Document statistics for the status bar and share preview. */
 export interface DocStats {
@@ -11,13 +11,18 @@ export interface DocStats {
 }
 
 export function computeStats(leaves: { text: string }[]): DocStats {
-  let words = 0, chars = 0, sentences = 0
+  let words = 0, cjkChars = 0, chars = 0, sentences = 0
   for (const leaf of leaves) {
-    words += countWords(leaf.text)
+    const ranges = wordRanges(leaf.text)
+    words += ranges.length
+    for (const r of ranges) {
+      if (/^[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]$/.test(leaf.text.slice(r.from, r.to))) cjkChars += 1
+    }
     chars += graphemeLength(leaf.text)
     sentences += countSentences(leaf.text)
   }
-  const minutes = Math.max(1, Math.round(words / 220))
+  const latinWords = words - cjkChars
+  const minutes = Math.max(1, Math.round(latinWords / 220 + cjkChars / 300))
   return { words, chars, minutes, paragraphs: leaves.length, sentences }
 }
 

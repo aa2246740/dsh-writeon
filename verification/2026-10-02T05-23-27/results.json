@@ -1,0 +1,174 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node@24/24.20.0/bin/node",
+      "/Users/devin/repos/dsh-writeon/node_modules/.bin/playwright",
+      "test",
+      "--grep",
+      "chinese"
+    ],
+    "configFile": "/Users/devin/repos/dsh-writeon/playwright.config.ts",
+    "rootDir": "/Users/devin/repos/dsh-writeon/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/devin/repos/dsh-writeon/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/devin/repos/dsh-writeon/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "/Users/devin/repos/dsh-writeon/verification/2026-10-02T05-23-27/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "deterministic.spec.ts",
+      "file": "deterministic.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "chinese: typing, stats, word/sentence variants, ghost, persistence",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 14521,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.wo-group')\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('.wo-group') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.wo-group')\u001b[22m\n\u001b[2m    24 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.wo-group')\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('.wo-group') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.wo-group')\u001b[22m\n\u001b[2m    24 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n    at /Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts:345:43",
+                    "location": {
+                      "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                      "column": 43,
+                      "line": 345
+                    },
+                    "snippet": "  343 |   await openWriteOn(page, { provider: 'test' })\n  344 |   await expect(page.locator('.wo-editor .ProseMirror')).toContainText('今天下雨了')\n> 345 |   await expect(page.locator('.wo-group')).toHaveCount(2)\n      |                                           ^\n  346 |   await shot(page, 'zh-reload')\n  347 |   vlog('chinese journey: PASS')\n  348 | })"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "column": 43,
+                        "line": 345
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.wo-group')\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" locator('.wo-group') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.wo-group')\u001b[22m\n\u001b[2m    24 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  343 |   await openWriteOn(page, { provider: 'test' })\n  344 |   await expect(page.locator('.wo-editor .ProseMirror')).toContainText('今天下雨了')\n> 345 |   await expect(page.locator('.wo-group')).toHaveCount(2)\n      |                                           ^\n  346 |   await shot(page, 'zh-reload')\n  347 |   vlog('chinese journey: PASS')\n  348 | })\n    at /Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts:345:43"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-02T05:23:32.003Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/devin/repos/dsh-writeon/test-results/deterministic-chinese-typi-22dfe--variants-ghost-persistence/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/devin/repos/dsh-writeon/test-results/deterministic-chinese-typi-22dfe--variants-ghost-persistence/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/devin/repos/dsh-writeon/tests/e2e/deterministic.spec.ts",
+                    "column": 43,
+                    "line": 345
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5d36395c280cbb34e3b0-50702079aa4644892e70",
+          "file": "deterministic.spec.ts",
+          "line": 320,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-02T05:23:31.692Z",
+    "duration": 15176.458,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

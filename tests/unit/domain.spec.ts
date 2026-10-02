@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { graphemeLength, isGraphemeBoundary, sentenceRanges, wordRanges, countWords } from '../../src/domain/segment.js'
+import { detectDocLanguage, graphemeLength, isGraphemeBoundary, sentenceRanges, wordRanges, wordUnitRanges, countWords } from '../../src/domain/segment.js'
+import { computeStats } from '../../src/domain/stats.js'
 import { articleFor, isArticle, matchCase } from '../../src/domain/article.js'
 import { textHash, docHash, validateAnchor, validateCuts, type FlatLeaf } from '../../src/domain/anchors.js'
 import { deserializeProject, serializeProject, newProject, looksLikeProject } from '../../src/domain/serialize.js'
@@ -43,6 +44,31 @@ describe('segment', () => {
   it('countWords does not count punctuation as words', () => {
     expect(countWords('A cat sits on an owl. The dog runs fast.')).toBe(10)
     expect(countWords('hello, world!')).toBe(2)
+  })
+  it('countWords counts each CJK char as one word (字数 convention)', () => {
+    expect(countWords('我喜欢写作')).toBe(5)
+    expect(countWords('I think 写作很酷')).toBe(6) // 2 latin words + 4 CJK chars
+  })
+  it('wordUnitRanges keeps ICU CJK words whole for variant snapping', () => {
+    const r = wordUnitRanges('我喜欢写作')
+    expect(r).toContainEqual({ from: 3, to: 5 }) // '写作' one unit, not two chars
+    const m = wordUnitRanges('I think 写作很酷')
+    expect(m.map(x => 'I think 写作很酷'.slice(x.from, x.to))).toEqual(['I', 'think', '写作', '很酷'])
+  })
+  it('sentenceRanges splits CJK sentence terminators 。！？', () => {
+    const r = sentenceRanges('今天下雨了。我明天去公园！你好吗？')
+    expect(r.map(x => '今天下雨了。我明天去公园！你好吗？'.slice(x.from, x.to))).toEqual(['今天下雨了。', '我明天去公园！', '你好吗？'])
+  })
+  it('detectDocLanguage picks dominant script', () => {
+    expect(detectDocLanguage('今天下雨了，明天去公园。')).toBe('zh')
+    expect(detectDocLanguage('A cat sits on an owl.')).toBe('en')
+    expect(detectDocLanguage('mainly English with 少量中文')).toBe('en')
+  })
+  it('computeStats blends latin wpm and CJK cpm for minutes', () => {
+    const zh = computeStats([{ text: '我喜欢写作这个插件' }])
+    expect(zh.words).toBe(9)
+    const en = computeStats([{ text: 'hello world ' .repeat(100).trim() }])
+    expect(en.minutes).toBe(1) // 200 words / 220 wpm
   })
 })
 

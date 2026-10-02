@@ -7,7 +7,7 @@ import { SCHEMA_VERSION, type Entities, type LabRun, type ProjectFile, type Vari
 import { newProject } from '../domain/serialize.js'
 import { deserializeProject, serializeProject } from '../domain/serialize.js'
 import { newId, newRequestId, newRunId } from '../domain/ids.js'
-import { countWords, graphemeLength, sentenceRanges, wordRanges } from '../domain/segment.js'
+import { countWords, detectDocLanguage, graphemeLength, sentenceRanges, wordRanges, wordUnitRanges } from '../domain/segment.js'
 import { computeStats, type DocStats } from '../domain/stats.js'
 import { extractJson, type AiProxyRequest } from '../domain/contract.js'
 import { validateAlternatives, validateDiagnose, validateTrim } from '../domain/contract-validate.js'
@@ -366,7 +366,7 @@ export class WriteOnController {
       const $pos = sel.$from
       const text = $pos.parent.textContent
       const off = $pos.parentOffset
-      const wr = wordRanges(text).find(r => off >= r.from && off <= r.to)
+      const wr = wordUnitRanges(text).find(r => off >= r.from && off <= r.to)
       if (wr !== undefined) {
         const tr = this.view.state.tr.setSelection(TextSelection.create(this.view.state.doc, $pos.start() + wr.from, $pos.start() + wr.to))
         this.onTransaction(tr)
@@ -545,7 +545,7 @@ export class WriteOnController {
     const requestId = newRequestId()
     const base = { requestId, baseRevision: this.contentVersion, baseHash: docHash(leaves) }
     const runId = newRunId()
-    const prompt = alternativesPrompt({ requestId, baseRevision: base.baseRevision, baseHash: base.baseHash, scope: group.scope, target, context, count })
+    const prompt = alternativesPrompt({ requestId, baseRevision: base.baseRevision, baseHash: base.baseHash, scope: group.scope, target, context, count, language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: 'alternatives', runId })
     if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
     const valid = validateAlternatives(extractJson(text), base)
@@ -563,7 +563,7 @@ export class WriteOnController {
     const baseHash = docHash(leaves)
     const runId = newRunId()
     const requestId = newRequestId()
-    const prompt = labPrompt({ requestId, baseRevision, baseHash, goal, fix, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: this.ui.language })
+    const prompt = labPrompt({ requestId, baseRevision, baseHash, goal, fix, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: fix ? 'fix' : 'diagnose', runId })
     if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
     const valid = validateDiagnose(extractJson(text), { requestId, baseRevision, baseHash }, leaves, fix ? 'fix' : 'diagnose')
@@ -604,7 +604,7 @@ export class WriteOnController {
     const targetWords = Math.max(1, Math.round(currentWords * (1 - level / 100)))
     const runId = newRunId()
     const requestId = newRequestId()
-    const prompt = trimPrompt({ requestId, baseRevision, baseHash, level, targetWords, currentWords, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: this.ui.language })
+    const prompt = trimPrompt({ requestId, baseRevision, baseHash, level, targetWords, currentWords, leaves: leaves.map(l => ({ leafId: l.leafId, text: l.text })), language: detectDocLanguage(leaves.map(l => l.text).join('\n')) })
     const baselineDoc = this.view.state.doc.toJSON()
     const { ok, text } = await this.callModel({ requestId, user: prompt, kind: 'trim', runId })
     if (!ok || text === undefined) { this.notice(this.ui.language === 'zh' ? '模型调用失败' : 'Model call failed'); return }
