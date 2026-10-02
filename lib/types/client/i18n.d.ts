@@ -79,7 +79,6 @@ export declare const dictionaries: {
         readonly newSentence: "Sentence alt";
         readonly newParagraph: "Paragraph alt";
         readonly useThis: "Use";
-        readonly langSwitch: "中";
         readonly scopeWord: "word";
         readonly scopeSentence: "sentence";
         readonly scopeParagraph: "paragraph";
@@ -181,7 +180,6 @@ export declare const dictionaries: {
         readonly newSentence: "句子候选";
         readonly newParagraph: "段落候选";
         readonly useThis: "采用";
-        readonly langSwitch: "EN";
         readonly scopeWord: "词";
         readonly scopeSentence: "句";
         readonly scopeParagraph: "段";

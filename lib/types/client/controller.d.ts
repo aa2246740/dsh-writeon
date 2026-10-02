@@ -3,6 +3,7 @@ import { type Entities } from '../domain/entities.js';
 import { type DocStats } from '../domain/stats.js';
 import { type LabGoal } from '../domain/prompts.js';
 import * as cmd from '../editor/commands.js';
+import type { dictionaries } from './i18n.js';
 export interface ModelChoice {
     provider: string;
     model: string;
@@ -43,7 +44,6 @@ export interface UiState {
         scope: 'word' | 'sentence' | 'paragraph';
     };
     error?: string;
-    language: 'zh' | 'en';
 }
 type Listener = () => void;
 export declare class WriteOnController {
@@ -62,9 +62,10 @@ export declare class WriteOnController {
     private lastDecoSpecs;
     constructor(host: {
         selectPanel(id: string | null): void;
+        tr(key: keyof typeof dictionaries.en): string;
     });
-    private static loadLanguage;
-    setLanguage(lang: 'zh' | 'en'): void;
+    /** UI strings route through the host-bound translator — the panel follows
+     * the DSH language preference, including live language switches. */
     private tr;
     subscribe: (l: Listener) => (() => void);
     getSnapshot: () => UiState;

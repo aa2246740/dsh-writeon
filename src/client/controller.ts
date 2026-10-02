@@ -18,7 +18,7 @@ import { anchorPos, flatten, fragmentJSON, ghostRanges, groupRange } from '../ed
 import * as cmd from '../editor/commands.js'
 import { HttpProvider, TestProvider, type AiProvider } from './ai-provider.js'
 import { Presence, deleteProject, kvGet, kvSet, listProjects, loadProject, saveProject } from './storage.js'
-import { dictionaries } from './i18n.js'
+import type { dictionaries } from './i18n.js'
 
 export interface ModelChoice { provider: string; model: string; label: string }
 
@@ -45,7 +45,6 @@ export interface UiState {
   sharePreview?: { text: string; stats: DocStats }
   pendingExpand?: { scope: 'word' | 'sentence' | 'paragraph' }
   error?: string
-  language: 'zh' | 'en'
 }
 
 type Listener = () => void
@@ -72,31 +71,19 @@ export class WriteOnController {
   private destroyed = false
   private lastDecoSpecs: DecoSpec[] = []
 
-  constructor(private host: { selectPanel(id: string | null): void }) {
+  constructor(private host: { selectPanel(id: string | null): void; tr(key: keyof typeof dictionaries.en): string }) {
     this.ui = {
       phase: 'loading', projectId: null, projects: [], saved: 'clean',
       sidePanel: 'none', models: [], providerKind: 'none', readOnly: false,
       conflictTab: false, hidden: false,
       stats: { words: 0, chars: 0, minutes: 0, paragraphs: 0, sentences: 0 },
-      language: WriteOnController.loadLanguage(),
     }
   }
 
-  private static loadLanguage(): 'zh' | 'en' {
-    try {
-      const saved = localStorage.getItem('wo-lang')
-      if (saved === 'zh' || saved === 'en') return saved
-    } catch { /* ignore */ }
-    return (navigator.language ?? 'en').startsWith('zh') ? 'zh' : 'en'
-  }
-
-  setLanguage(lang: 'zh' | 'en'): void {
-    try { localStorage.setItem('wo-lang', lang) } catch { /* ignore */ }
-    this.set({ language: lang })
-  }
-
+  /** UI strings route through the host-bound translator — the panel follows
+   * the DSH language preference, including live language switches. */
   private tr(key: keyof typeof dictionaries.en): string {
-    return dictionaries[this.ui.language][key] ?? dictionaries.en[key] ?? String(key)
+    return this.host.tr(key)
   }
 
   // ---- React bridge -------------------------------------------------------

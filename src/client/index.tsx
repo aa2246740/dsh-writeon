@@ -40,7 +40,11 @@ export function apply(ctx: Context): void {
   document.head.appendChild(styleTag)
   ctx.effect(() => () => styleTag.remove())
 
-  const controller = new WriteOnController({ selectPanel: id => layout.selectPanel(id) })
+  const controller = new WriteOnController({
+    selectPanel: id => layout.selectPanel(id),
+    // Panel notices follow the host locale — the bound t re-resolves per call.
+    tr: key => t(key),
+  })
   ctx.effect(() => () => controller.destroy())
 
   slots.inject('sidebar.panellist', () => slots.register({
@@ -58,6 +62,7 @@ export function apply(ctx: Context): void {
     inject: () => ({
       controller,
       selectPanel: (id: string | null) => layout.selectPanel(id),
+      locale,
     }),
   }, WriteOnPage))
 }

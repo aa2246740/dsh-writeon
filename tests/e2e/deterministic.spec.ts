@@ -348,19 +348,20 @@ test('chinese: typing, stats, word/sentence variants, ghost, persistence', async
   vlog('chinese journey: PASS')
 })
 
-test('ui language: 中/EN switcher localizes the whole panel and persists', async ({ page }) => {
+test('ui language: panel follows the DSH host locale', async ({ page, context }) => {
+  // Host locale resolves navigator.languages when no explicit preference exists —
+  // a zh-CN browser boots the host (and therefore the panel) in Chinese.
+  await context.addInitScript(() => {
+    Object.defineProperty(window.navigator, 'languages', { get: () => ['zh-CN', 'zh'] })
+    Object.defineProperty(window.navigator, 'language', { get: () => 'zh-CN' })
+  })
   await openWriteOn(page, { provider: 'test' })
-  await newDoc(page, 'I think this is very useful, actually.')
-  // English default (navigator.language = en)
-  await expect(page.getByTestId('wo-undo')).toHaveText('Undo')
-  // one click → every control/label/panel switches to Chinese
-  await page.getByTestId('wo-lang').click()
   await expect(page.getByTestId('wo-undo')).toHaveText('撤销')
   await expect(page.getByTestId('wo-redo')).toHaveText('重做')
   await expect(page.getByTestId('wo-panel-alt')).toHaveText('候选')
   await expect(page.getByTestId('wo-panel-lab')).toHaveText('实验室')
+  await newDoc(page, 'I think this is very useful, actually.')
   await expect(page.getByTestId('wo-newdoc')).toHaveText('新建稿件')
-  await expect(page.getByTestId('wo-lang')).toHaveText('EN')
   // scope badge + lab run header localize as well
   await selectText(page, 'very')
   await page.getByTestId('wo-alt-word').click()
@@ -370,16 +371,7 @@ test('ui language: 中/EN switcher localizes the whole panel and persists', asyn
   await waitForRun(page)
   await expect(page.locator('.wo-run-head').first()).toContainText('标记')
   await expect(page.locator('.wo-run-head').first()).toContainText('待处理')
-  await shot(page, 'zh-ui-panel')
-  // choice persists across reload (localStorage)
-  await saved(page)
-  await page.reload()
-  await openWriteOn(page, { provider: 'test' })
-  await expect(page.getByTestId('wo-undo')).toHaveText('撤销')
-  await shot(page, 'zh-ui-reload')
-  // and switches back
-  await page.getByTestId('wo-lang').click()
-  await expect(page.getByTestId('wo-undo')).toHaveText('Undo')
+  await shot(page, 'zh-host-locale')
   vlog('ui language: PASS')
 })
 

@@ -1,11 +1,10 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react'
 import type { WriteOnController, UiState } from './controller.js'
 import { groupRange } from '../editor/model.js'
 import { groupAt, selectGroupRange } from '../editor/commands.js'
 import type { LabGoal } from '../domain/prompts.js'
-import { dictionaries } from './i18n.js'
 
-type I18nKey = keyof typeof dictionaries.en
+type I18nKey = keyof typeof import('./i18n.js').dictionaries.en
 type T = (key: I18nKey) => string
 
 interface PageProps {
@@ -13,11 +12,15 @@ interface PageProps {
   t: T
   /** Switch the DSH main panel (used by "back to chat"). */
   selectPanel: (id: string | null) => void
+  /** Host locale runtime — subscribed so the panel re-renders on language change. */
+  locale?: { subscribe(fn: () => void): () => void; getSnapshot(): { revision: number } }
 }
 
 function useUi(controller: WriteOnController): UiState {
   return useSyncExternalStore(controller.subscribe, controller.getSnapshot)
 }
+
+
 
 /** Left rail of the workspace: doc list + panel switch. */
 function DocBar({ c, t }: { c: WriteOnController; t: T }) {
@@ -100,7 +103,6 @@ function Toolbar({ c, t, selectPanel }: { c: WriteOnController; t: T; selectPane
       <button className="wo-btn wo-small" data-testid="wo-panel-lab" onClick={() => c.openLab()}>{t('lab')}</button>
       <button className="wo-btn wo-small" data-testid="wo-share" onClick={() => c.sharePreview()} title="Ctrl+Shift+P">{t('share')}</button>
       <span className="wo-flex" />
-      <button className="wo-btn wo-small" data-testid="wo-lang" onClick={() => c.setLanguage(ui.language === 'zh' ? 'en' : 'zh')} title="中/EN">{t('langSwitch')}</button>
       <button className="wo-btn wo-small" data-testid="wo-hide" onClick={() => c.toggleHidden()} title="Alt+Shift+Z">{t('hideControls')}</button>
       <button className="wo-btn wo-small" data-testid="wo-save" onClick={() => void c.saveNow()} title="Ctrl+S">{t('save')}</button>
     </div>
@@ -362,11 +364,15 @@ function ShareOverlay({ c, t }: { c: WriteOnController; t: T }) {
 
 /** The workspace root: toolbar + doc list + editor canvas + side panel. */
 export function WriteOnPage(props: PageProps) {
-  const { controller: c, selectPanel } = props
+  const { controller: c, t, selectPanel, locale } = props
   const mountRef = useRef<HTMLDivElement>(null)
   const ui = useUi(c)
-  // UI language follows the plugin's own switch (persisted), not the host locale.
-  const t: T = k => dictionaries[ui.language][k] ?? dictionaries.en[k]
+  // Re-render when the DSH language preference changes (t resolves live).
+  const subscribeLocale = useCallback(
+    (fn: () => void) => (locale === undefined ? () => {} : locale.subscribe(fn)),
+    [locale],
+  )
+  useSyncExternalStore(subscribeLocale, () => locale?.getSnapshot().revision ?? 0)
 
   useEffect(() => {
     const el = mountRef.current

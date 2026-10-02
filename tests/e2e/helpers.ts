@@ -31,7 +31,7 @@ export async function openWriteOn(page: Page, opts: { provider?: 'test' | 'http'
     u.searchParams.set('woprovider', 'test')
     await page.goto(u.toString())
   }
-  await page.getByRole('button', { name: 'Write On' }).click()
+  await page.getByRole('button', { name: /Write On|写作/ }).click()
   await expect(page.getByTestId('wo-root')).toBeVisible()
   return page
 }
